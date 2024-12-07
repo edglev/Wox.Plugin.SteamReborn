@@ -1,5 +1,6 @@
-﻿using System.IO;
-using System.Net;
+﻿using System;
+using System.IO;
+using Microsoft.Win32;
 using NeXt.Vdf;
 using WoxSteam.BinaryVdf;
 using VdfInteger = NeXt.Vdf.VdfInteger;
@@ -19,7 +20,7 @@ namespace WoxSteam
 		/// <summary>
 		/// Path where resources, like icons, should be stored when downloaded.
 		/// </summary>
-		private readonly string resourcesPath;
+		private readonly Steam steam;
 
 		/// <summary>
 		/// Application id. Used to identify game on steam.
@@ -41,10 +42,10 @@ namespace WoxSteam
 		/// </summary>
 		public BinaryVdfItem Details { get; set; }
 
-		public Game(string pathToManifest, string resourcesPath)
+		public Game(string pathToManifest, Steam steam)
 		{
 			manifest = (VdfTable) VdfDeserializer.FromFile(pathToManifest).Deserialize();
-			this.resourcesPath = resourcesPath;
+			this.steam = steam;
 		}
 
 		/// <summary>
@@ -53,22 +54,54 @@ namespace WoxSteam
 		/// <returns>local path to cached game icon</returns>
 		private string LoadIcon()
 		{
-			if (Details == null) return null;
-            if (Details.GetString("clienticon") == null) return null;
-			var icon = Details.GetString("clienticon") + ".ico";
-			var cachePath = Path.Combine(resourcesPath, icon);
+			var icon = GetGameIconPathFromLibraryCache(Appid);
 
-			if (File.Exists(cachePath)) return cachePath;
-
-			using (var client = new WebClient())
+			if (icon != string.Empty)
 			{
-				client.DownloadFile(
-					$"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/{Appid}/{icon}",
-					cachePath
-				);
+				return icon;
 			}
 
-			return cachePath;
+			icon = GetGameIconPathRegistry(Appid);
+
+            if (icon != string.Empty)
+            {
+                return icon;
+            }
+
+            return null;
 		}
-	}
+
+		private string GetGameIconPathFromLibraryCache(int gameId)
+		{
+			var iconPath = Path.Combine(this.steam.RootPath, "appcache", "librarycache", gameId + "_icon.jpg");
+
+            if (File.Exists(iconPath))
+			{
+				return iconPath;
+			}
+
+			return String.Empty;
+		}
+
+
+        private static string GetGameIconPathRegistry(int gameId)
+        {
+            try
+            {
+
+                RegistryKey regKeyGame = Registry.LocalMachine.OpenSubKey($"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App {gameId}", false);
+
+                if (regKeyGame != null)
+                {
+                    return regKeyGame.GetValue("DisplayIcon", string.Empty).ToString();
+                }
+
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+    }
 }

@@ -1,12 +1,12 @@
 {
-    "ID":"D44B2D14487545FCA5825DC35A7329F5",
-    "ActionKeyword":"*",
-    "Name":"Steam",
-    "Description":"Allows launching installed steam games",
-    "Author":"zipekjan",
-    "Version":"1.0.1",
-    "Language":"csharp",
-    "Website":"https://github.com/SkaceKamen/Wox.Plugin.Steam",
-    "IcoPath":"Images\\app.png",
-    "ExecuteFileName":"WoxSteam.dll"
+  "ID": "D44B2D14487545FCA5825DC35A7329F1",
+  "ActionKeyword": "*",
+  "Name": "Steam Reborn",
+  "Description": "Allows launching installed steam games, forked Wox.Plugin.Steam with fixes",
+  "Author": "elevin",
+  "Version": "1.0.0",
+  "Language": "csharp",
+  "Website": "https://github.com/edglev/Wox.Plugin.SteamReborn",
+  "IcoPath": "Images\\app.png",
+  "ExecuteFileName": "WoxSteam.dll"
 }

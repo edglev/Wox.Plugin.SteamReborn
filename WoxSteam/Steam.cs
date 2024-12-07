@@ -153,7 +153,7 @@ namespace WoxSteam
 					AppInfo = JsonConvert.DeserializeObject<Dictionary<uint, BinaryVdfItem>>(File.ReadAllText(cache));
 				}
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				// Failed to load appinfo, but we can still display games, so deploy dummy appinfo
 				AppInfo = null;
@@ -166,17 +166,20 @@ namespace WoxSteam
 		private void LoadLibraries()
 		{
 			Libraries.Clear();
-
 			Libraries.Add(new Library(this, RootPath));
 
 			var librariesPath = Path.Combine(RootPath, "steamapps", "libraryfolders.vdf");
 			if (!File.Exists(librariesPath)) return;
-
+			
 			var folders = (VdfTable) VdfDeserializer.FromFile(librariesPath).Deserialize();
+			
 			var index = 1;
 			while (folders.ContainsName(index.ToString()))
 			{
-				Libraries.Add(new Library(this, ((VdfString) folders.GetByName(index.ToString())).Content));
+				var libraryPath =((VdfString) ((VdfTable) folders.GetByName(index.ToString())).GetByName("path"));
+
+
+				Libraries.Add(new Library(this, libraryPath.Content));
 				index++;
 			}
 		}

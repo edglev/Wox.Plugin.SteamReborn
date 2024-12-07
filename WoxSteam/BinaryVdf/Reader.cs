@@ -16,7 +16,6 @@ namespace WoxSteam.BinaryVdf
 		public Reader(string path)
 		{
 			reader = new BinaryReader(File.OpenRead(path), System.Text.Encoding.UTF8);
-
 			// Read some header fields
 			reader.ReadByte();
 			if (reader.ReadByte() != 0x44 ||

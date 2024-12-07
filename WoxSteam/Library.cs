@@ -48,7 +48,7 @@ namespace WoxSteam
 			{
 				if (AppMetaRegex.IsMatch(fileInfo.Name))
 				{
-					yield return new Game(fileInfo.FullName, steam.CachePath);
+					yield return new Game(fileInfo.FullName, steam);
 				}
 			}
 		}
